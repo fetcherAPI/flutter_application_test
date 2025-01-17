@@ -37,38 +37,57 @@ class _PostsScreenState extends State<PostsScreen> {
       appBar: AppBar(
         title: const Text('Posts'),
       ),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : _data.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.error, size: 50, color: Colors.grey),
-                      SizedBox(height: 20),
-                      Text(
-                        'Нет данных для отображения',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: _data.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_data[index]['title']),
-                      subtitle: Text(_data[index]['body']),
-                    );
-                  },
-                ),
+      body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _fetchData,
         tooltip: 'Получить посты',
         child: const Icon(Icons.refresh),
       ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (_data.isEmpty) {
+      return _buildEmptyState();
+    } else {
+      return PostsListView(data: _data);
+    }
+  }
+
+  Widget _buildEmptyState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error, size: 50, color: Colors.grey),
+          SizedBox(height: 20),
+          Text(
+            'Нет данных для отображения',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PostsListView extends StatelessWidget {
+  final List<dynamic> data;
+
+  const PostsListView({super.key, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(data[index]['title']),
+          subtitle: Text(data[index]['body']),
+        );
+      },
     );
   }
 }
